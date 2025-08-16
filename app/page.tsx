@@ -25,23 +25,16 @@ export default function HomePage() {
     setResult(null);
 
     try {
-      const res = await fetch("/api/fetch", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          url,
-          headers: {
-            "User-Agent": userAgent,
-            Referer: referer,
-            Origin: origin,
-          },
-        }),
-      });
+      const res = await fetch(`/api/fetch?url=${encodeURIComponent(url)}&userAgent=${encodeURIComponent(userAgent)}&referer=${encodeURIComponent(referer)}&origin=${encodeURIComponent(origin)}`);
 
       const data: Result = await res.json();
       setResult(data);
-    } catch (err: any) {
-      setResult({ error: err.message });
+    } catch (err) {
+      if (err instanceof Error) {
+        setResult({ error: err.message });
+      } else {
+        setResult({ error: "Unknown error" });
+      }
     }
 
     setLoading(false);
