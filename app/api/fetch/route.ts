@@ -22,18 +22,17 @@ export async function GET(req: Request) {
       },
     });
 
-    const headers: Record<string, string> = {};
-    response.headers.forEach((value, key) => {
-      headers[key] = value;
-    });
+    // Clone the response body (ArrayBuffer for binary, works with text/html/json)
+    const body = await response.arrayBuffer();
 
-    const body = await response.text();
+    // Forward headers, but avoid forbidden ones
+    const headers = new Headers(response.headers);
+    headers.set("Access-Control-Allow-Origin", "*"); // allow browser access
 
-    return NextResponse.json({
-      url,
+    return new Response(body, {
       status: response.status,
+      statusText: response.statusText,
       headers,
-      body: body.slice(0, 2000),
     });
   } catch (err) {
     if (err instanceof Error) {
